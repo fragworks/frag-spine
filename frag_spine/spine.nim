@@ -1,4 +1,7 @@
 type
+  UncheckedArray* {.unchecked.} [T] = array[1,T]
+
+type
   spTransformMode* = enum
     SP_TRANSFORMMODE_NORMAL, SP_TRANSFORMMODE_ONLYTRANSLATION,
     SP_TRANSFORMMODE_NOROTATIONORREFLECTION, SP_TRANSFORMMODE_NOSCALE,
@@ -19,17 +22,17 @@ type
   spSkeleton* = object
     data*: ptr spSkeletonData
     bonesCount*: cint
-    bones*: ptr ptr spBone
+    bones*: ptr UncheckedArray[ptr spBone]
     root*: ptr spBone
     slotsCount*: cint
-    slots*: ptr ptr spSlot
-    drawOrder*: ptr ptr spSlot
+    slots*: ptr UncheckedArray[ptr spSlot]
+    drawOrder*: ptr UncheckedArray[ptr spSlot]
     ikConstraintsCount*: cint
-    ikConstraints*: ptr ptr spIkConstraint
+    ikConstraints*: ptr UncheckedArray[ptr spIkConstraint]
     transformConstraintsCount*: cint
-    transformConstraints*: ptr ptr spTransformConstraint
+    transformConstraints*: ptr UncheckedArray[ptr spTransformConstraint]
     pathConstraintsCount*: cint
-    pathConstraints*: ptr ptr spPathConstraint
+    pathConstraints*: ptr UncheckedArray[ptr spPathConstraint]
     skin*: ptr spSkin
     r*: cfloat
     g*: cfloat
@@ -46,7 +49,7 @@ type
     skeleton*: ptr spSkeleton
     parent*: ptr spBone
     childrenCount*: cint
-    children*: ptr ptr spBone
+    children*: ptr UncheckedArray[ptr spBone]
     x*: cfloat
     y*: cfloat
     rotation*: cfloat
@@ -76,22 +79,22 @@ type
     width*: cfloat
     height*: cfloat
     bonesCount*: cint
-    bones*: ptr ptr spBoneData
+    bones*: ptr UncheckedArray[ptr spBoneData]
     slotsCount*: cint
-    slots*: ptr ptr spSlotData
+    slots*: ptr UncheckedArray[ptr spSlotData]
     skinsCount*: cint
-    skins*: ptr ptr spSkin
+    skins*: ptr UncheckedArray[ptr spSkin]
     defaultSkin*: ptr spSkin
     eventsCount*: cint
-    events*: ptr ptr spEventData
+    events*: ptr UncheckedArray[ptr spEventData]
     animationsCount*: cint
-    animations*: ptr ptr spAnimation
+    animations*: ptr UncheckedArray[ptr spAnimation]
     ikConstraintsCount*: cint
-    ikConstraints*: ptr ptr spIkConstraintData
+    ikConstraints*: ptr UncheckedArray[ptr spIkConstraintData]
     transformConstraintsCount*: cint
-    transformConstraints*: ptr ptr spTransformConstraintData
+    transformConstraints*: ptr UncheckedArray[ptr spTransformConstraintData]
     pathConstraintsCount*: cint
-    pathConstraints*: ptr ptr spPathConstraintData
+    pathConstraints*: ptr UncheckedArray[ptr spPathConstraintData]
 
   spSkin* = object
     name*: cstring
@@ -162,12 +165,12 @@ type
     name*: cstring
     duration*: cfloat
     timelinesCount*: cint
-    timelines*: ptr ptr spTimeline
+    timelines*: ptr UncheckedArray[ptr spTimeline]
 
   spSkeletonBounds* = object
     count*: cint
-    boundingBoxes*: ptr ptr spBoundingBoxAttachment
-    polygons*: ptr ptr spPolygon
+    boundingBoxes*: ptr UncheckedArray[ptr spBoundingBoxAttachment]
+    polygons*: ptr UncheckedArray[ptr spPolygon]
     minX*: cfloat
     minY*: cfloat
     maxX*: cfloat
@@ -212,7 +215,7 @@ type
     framesCount*: cint
     frames*: ptr cfloat
     frameVerticesCount*: cint
-    frameVertices*: ptr ptr cfloat
+    frameVertices*: ptr UncheckedArray[ptr cfloat]
     slotIndex*: cint
     attachment*: ptr spAttachment
 
@@ -220,13 +223,13 @@ type
     super*: spTimeline
     framesCount*: cint
     frames*: ptr cfloat
-    events*: ptr ptr spEvent
+    events*: ptr UncheckedArray[ptr spEvent]
 
   spDrawOrderTimeline* = object
     super*: spTimeline
     framesCount*: cint
     frames*: ptr cfloat
-    drawOrders*: ptr ptr cint
+    drawOrders*: ptr UncheckedArray[ptr cint]
     slotsCount*: cint
 
   spIkConstraintTimeline* = object
@@ -257,7 +260,7 @@ type
     name*: cstring
     order*: cint
     bonesCount*: cint
-    bones*: ptr ptr spBoneData
+    bones*: ptr UncheckedArray[ptr spBoneData]
     target*: ptr spBoneData
     rotateMix*: cfloat
     translateMix*: cfloat
@@ -274,7 +277,7 @@ type
     name*: cstring
     order*: cint
     bonesCount*: cint
-    bones*: ptr ptr spBoneData
+    bones*: ptr UncheckedArray[ptr spBoneData]
     target*: ptr spBoneData
     bendDirection*: cint
     mix*: cfloat
@@ -289,7 +292,7 @@ type
     name*: cstring
     order*: cint
     bonesCount*: cint
-    bones*: ptr ptr spBoneData
+    bones*: ptr UncheckedArray[ptr spBoneData]
     target*: ptr spSlotData
     positionMode*: spPositionMode
     spacingMode*: spSpacingMode
@@ -308,7 +311,7 @@ type
   spTransformConstraint* = object
     data*: ptr spTransformConstraintData
     bonesCount*: cint
-    bones*: ptr ptr spBone
+    bones*: ptr UncheckedArray[ptr spBone]
     target*: ptr spBone
     rotateMix*: cfloat
     translateMix*: cfloat
@@ -318,7 +321,7 @@ type
   spIkConstraint* = object
     data*: ptr spIkConstraintData
     bonesCount*: cint
-    bones*: ptr ptr spBone
+    bones*: ptr UncheckedArray[ptr spBone]
     target*: ptr spBone
     bendDirection*: cint
     mix*: cfloat
@@ -397,7 +400,7 @@ type
   spPathConstraint* = object
     data*: ptr spPathConstraintData
     bonesCount*: cint
-    bones*: ptr ptr spBone
+    bones*: ptr UncheckedArray[ptr spBone]
     target*: ptr spSlot
     position*: cfloat
     spacing*: cfloat
@@ -522,7 +525,7 @@ type
   spAnimationState* = object
     data*: ptr spAnimationStateData
     tracksCount*: cint
-    tracks*: ptr ptr spTrackEntry
+    tracks*: ptr UncheckedArray[ptr spTrackEntry]
     listener*: spAnimationStateListener
     timeScale*: cfloat
     rendererObject*: pointer
@@ -542,7 +545,7 @@ type
   IspAnimationState* = object
     super*: spAnimationState
     eventsCount*: cint
-    events*: ptr ptr spEvent
+    events*: ptr UncheckedArray[ptr spEvent]
     queue*: ptr IspEventQueue
     propertyIDs*: ptr cint
     propertyIDsCount*: cint
@@ -569,67 +572,67 @@ type
   spAnimationStateListener* = proc (state: ptr spAnimationState; `type`: spEventType;
                                  entry: ptr spTrackEntry; event: ptr spEvent)
 
-#[
-proc spBoneData_create*(index: cint; name: cstring; parent: ptr spBoneData): ptr spBoneData
-proc spBoneData_dispose*(self: ptr spBoneData)
+
+proc spBoneData_create*(index: cint; name: cstring; parent: ptr spBoneData): ptr spBoneData {.importc: "spBoneData_create".}
+proc spBoneData_dispose*(self: ptr spBoneData) {.importc: "spBoneData_dispose".}
 
 
 
-proc spSlotData_create*(index: cint; name: cstring; boneData: ptr spBoneData): ptr spSlotData
-proc spSlotData_dispose*(self: ptr spSlotData)
-proc spSlotData_setAttachmentName*(self: ptr spSlotData; attachmentName: cstring)
+proc spSlotData_create*(index: cint; name: cstring; boneData: ptr spBoneData): ptr spSlotData {.importc: "spSlotData_create".}
+proc spSlotData_dispose*(self: ptr spSlotData) {.importc: "spSlotData_dispose".}
+proc spSlotData_setAttachmentName*(self: ptr spSlotData; attachmentName: cstring) {.importc: "spSlotData_setAttachmentName".}
 
 
 
 
-proc spAttachment_dispose*(self: ptr spAttachment)
+proc spAttachment_dispose*(self: ptr spAttachment) {.importc: "spAttachment_dispose".}
 
 
 
-proc spSkin_create*(name: cstring): ptr spSkin
-proc spSkin_dispose*(self: ptr spSkin)
+proc spSkin_create*(name: cstring): ptr spSkin {.importc: "spSkin_create".}
+proc spSkin_dispose*(self: ptr spSkin) {.importc: "spSkin_dispose".}
 proc spSkin_addAttachment*(self: ptr spSkin; slotIndex: cint; name: cstring;
-                          attachment: ptr spAttachment)
-proc spSkin_getAttachment*(self: ptr spSkin; slotIndex: cint; name: cstring): ptr spAttachment
+                          attachment: ptr spAttachment) {.importc: "spSkin_addAttachment".}
+proc spSkin_getAttachment*(self: ptr spSkin; slotIndex: cint; name: cstring): ptr spAttachment {.importc: "spSkin_getAttachment".}
 proc spSkin_getAttachmentName*(self: ptr spSkin; slotIndex: cint;
-                              attachmentIndex: cint): cstring
+                              attachmentIndex: cint): cstring {.importc: "spSkin_getAttachmentName".}
 proc spSkin_attachAll*(self: ptr spSkin; skeleton: ptr spSkeleton;
-                      oldspSkin: ptr spSkin)
+                      oldspSkin: ptr spSkin) {.importc: "spSkin_attachAll".}
 
 
-proc spEventData_create*(name: cstring): ptr spEventData
-proc spEventData_dispose*(self: ptr spEventData)
+proc spEventData_create*(name: cstring): ptr spEventData {.importc: "spEventData_create".}
+proc spEventData_dispose*(self: ptr spEventData) {.importc: "spEventData_dispose".}
   
 
 
-proc spEvent_create*(time: cfloat; data: ptr spEventData): ptr spEvent
-proc spEvent_dispose*(self: ptr spEvent)
+proc spEvent_create*(time: cfloat; data: ptr spEventData): ptr spEvent {.importc: "spEvent_create".}
+proc spEvent_dispose*(self: ptr spEvent) {.importc: "spEvent_dispose".}
   
   
 
 
-proc spAnimation_create*(name: cstring; timelinesCount: cint): ptr spAnimation
-proc spAnimation_dispose*(self: ptr spAnimation)
+proc spAnimation_create*(name: cstring; timelinesCount: cint): ptr spAnimation {.importc: "spAnimation_create".}
+proc spAnimation_dispose*(self: ptr spAnimation) {.importc: "spAnimation_dispose".}
 proc spAnimation_apply*(self: ptr spAnimation; skeleton: ptr spSkeleton;
                        lastTime: cfloat; time: cfloat; loop: cint;
-                       events: ptr ptr spEvent; eventsCount: ptr cint; alpha: cfloat;
-                       setupPose: cint; mixingOut: cint)
+                       events: ptr UncheckedArray[ptr spEvent]; eventsCount: ptr cint; alpha: cfloat;
+                       setupPose: cint; mixingOut: cint) {.importc: "spAnimation_apply".}
 
 
-proc spTimeline_dispose*(self: ptr spTimeline)
+proc spTimeline_dispose*(self: ptr spTimeline) {.importc: "spTimeline_dispose".}
 proc spTimeline_apply*(self: ptr spTimeline; skeleton: ptr spSkeleton;
-                      lastTime: cfloat; time: cfloat; firedEvents: ptr ptr spEvent;
+                      lastTime: cfloat; time: cfloat; firedEvents: ptr UncheckedArray[ptr spEvent];
                       eventsCount: ptr cint; alpha: cfloat; setupPose: cint;
-                      mixingOut: cint)
-proc spTimeline_getPropertyId*(self: ptr spTimeline): cint
+                      mixingOut: cint) {.importc: "spTimeline_apply".}
+proc spTimeline_getPropertyId*(self: ptr spTimeline): cint {.importc: "spTimeline_getPropertyId".}
 
 
-proc spCurveTimeline_setLinear*(self: ptr spCurveTimeline; frameIndex: cint)
-proc spCurveTimeline_setStepped*(self: ptr spCurveTimeline; frameIndex: cint)
+proc spCurveTimeline_setLinear*(self: ptr spCurveTimeline; frameIndex: cint) {.importc: "spCurveTimeline_setLinear".}
+proc spCurveTimeline_setStepped*(self: ptr spCurveTimeline; frameIndex: cint) {.importc: "spCurveTimeline_setStepped".}
 proc spCurveTimeline_setCurve*(self: ptr spCurveTimeline; frameIndex: cint;
-                              cx1: cfloat; cy1: cfloat; cx2: cfloat; cy2: cfloat)
+                              cx1: cfloat; cy1: cfloat; cx2: cfloat; cy2: cfloat) {.importc: "spCurveTimeline_setCurve".}
 proc spCurveTimeline_getCurvePercent*(self: ptr spCurveTimeline; frameIndex: cint;
-                                     percent: cfloat): cfloat
+                                     percent: cfloat): cfloat {.importc: "spCurveTimeline_getCurvePercent".}
 
 
 var
@@ -641,269 +644,267 @@ var ROTATE_ROTATION*: cint = 1
 var ROTATE_ENTRIES*: cint = 2
   
 
-proc spRotateTimeline_create*(framesCount: cint): ptr spRotateTimeline
+proc spRotateTimeline_create*(framesCount: cint): ptr spRotateTimeline {.importc: "spRotateTimeline_create".}
 proc spRotateTimeline_setFrame*(self: ptr spRotateTimeline; frameIndex: cint;
-                               time: cfloat; angle: cfloat)
+                               time: cfloat; angle: cfloat) {.importc: "spRotateTimeline_setFrame".}
 var TRANSLATE_ENTRIES*: cint = 3
 
-proc spTranslateTimeline_create*(framesCount: cint): ptr spTranslateTimeline
+proc spTranslateTimeline_create*(framesCount: cint): ptr spTranslateTimeline {.importc: "spTranslateTimeline_create".}
 proc spTranslateTimeline_setFrame*(self: ptr spTranslateTimeline; frameIndex: cint;
-                                  time: cfloat; x: cfloat; y: cfloat)
+                                  time: cfloat; x: cfloat; y: cfloat) {.importc: "spTranslateTimeline_setFrame".}
 
-proc spScaleTimeline_create*(framesCount: cint): ptr spScaleTimeline
+proc spScaleTimeline_create*(framesCount: cint): ptr spScaleTimeline {.importc: "spScaleTimeline_create".}
 proc spScaleTimeline_setFrame*(self: ptr spScaleTimeline; frameIndex: cint;
-                              time: cfloat; x: cfloat; y: cfloat)
+                              time: cfloat; x: cfloat; y: cfloat) {.importc: "spScaleTimeline_setFrame".}
 
-proc spShearTimeline_create*(framesCount: cint): ptr spShearTimeline
+proc spShearTimeline_create*(framesCount: cint): ptr spShearTimeline {.importc: "spShearTimeline_create".}
 proc spShearTimeline_setFrame*(self: ptr spShearTimeline; frameIndex: cint;
-                              time: cfloat; x: cfloat; y: cfloat)
+                              time: cfloat; x: cfloat; y: cfloat) {.importc: "spShearTimeline_setFrame".}
 var COLOR_ENTRIES*: cint = 5
 
 
-proc spColorTimeline_create*(framesCount: cint): ptr spColorTimeline
+proc spColorTimeline_create*(framesCount: cint): ptr spColorTimeline {.importc: "spColorTimeline_create".}
 proc spColorTimeline_setFrame*(self: ptr spColorTimeline; frameIndex: cint;
-                              time: cfloat; r: cfloat; g: cfloat; b: cfloat; a: cfloat)
+                              time: cfloat; r: cfloat; g: cfloat; b: cfloat; a: cfloat) {.importc: "spColorTimeline_setFrame".}
 
 
-proc spAttachmentTimeline_create*(framesCount: cint): ptr spAttachmentTimeline
+proc spAttachmentTimeline_create*(framesCount: cint): ptr spAttachmentTimeline {.importc: "spAttachmentTimeline_create".}
 proc spAttachmentTimeline_setFrame*(self: ptr spAttachmentTimeline;
                                    frameIndex: cint; time: cfloat;
-                                   attachmentName: cstring)
+                                   attachmentName: cstring) {.importc: "spAttachmentTimeline_setFrame".}
 
 
-proc spEventTimeline_create*(framesCount: cint): ptr spEventTimeline
+proc spEventTimeline_create*(framesCount: cint): ptr spEventTimeline {.importc: "spEventTimeline_create".}
 proc spEventTimeline_setFrame*(self: ptr spEventTimeline; frameIndex: cint;
-                              event: ptr spEvent)
+                              event: ptr spEvent) {.importc: "spEventTimeline_setFrame".}
 
 
-proc spDrawOrderTimeline_create*(framesCount: cint; slotsCount: cint): ptr spDrawOrderTimeline
+proc spDrawOrderTimeline_create*(framesCount: cint; slotsCount: cint): ptr spDrawOrderTimeline {.importc: "spDrawOrderTimeline_create".}
 proc spDrawOrderTimeline_setFrame*(self: ptr spDrawOrderTimeline; frameIndex: cint;
-                                  time: cfloat; drawOrder: ptr cint)
+                                  time: cfloat; drawOrder: ptr cint) {.importc: "spDrawOrderTimeline_setFrame".}
 
 
-proc spDeformTimeline_create*(framesCount: cint; frameVerticesCount: cint): ptr spDeformTimeline
+proc spDeformTimeline_create*(framesCount: cint; frameVerticesCount: cint): ptr spDeformTimeline {.importc: "spDeformTimeline_create".}
 proc spDeformTimeline_setFrame*(self: ptr spDeformTimeline; frameIndex: cint;
-                               time: cfloat; vertices: ptr cfloat)
+                               time: cfloat; vertices: ptr cfloat) {.importc: "spDeformTimeline_setFrame".}
 var IKCONSTRAINT_ENTRIES*: cint = 3
 
 
-proc spIkConstraintTimeline_create*(framesCount: cint): ptr spIkConstraintTimeline
+proc spIkConstraintTimeline_create*(framesCount: cint): ptr spIkConstraintTimeline {.importc: "spIkConstraintTimeline_create".}
 proc spIkConstraintTimeline_setFrame*(self: ptr spIkConstraintTimeline;
                                      frameIndex: cint; time: cfloat; mix: cfloat;
-                                     bendDirection: cint)
+                                     bendDirection: cint) {.importc: "spIkConstraintTimeline_setFrame".}
 var TRANSFORMCONSTRAINT_ENTRIES*: cint = 5
 
 
-proc spTransformConstraintTimeline_create*(framesCount: cint): ptr spTransformConstraintTimeline
+proc spTransformConstraintTimeline_create*(framesCount: cint): ptr spTransformConstraintTimeline {.importc: "spTransformConstraintTimeline_create".}
 proc spTransformConstraintTimeline_setFrame*(
     self: ptr spTransformConstraintTimeline; frameIndex: cint; time: cfloat;
-    rotateMix: cfloat; translateMix: cfloat; scaleMix: cfloat; shearMix: cfloat)
+    rotateMix: cfloat; translateMix: cfloat; scaleMix: cfloat; shearMix: cfloat) {.importc: "spTransformConstraintTimeline_setFrame".}
 var PATHCONSTRAINTPOSITION_ENTRIES*: cint = 2
 
 
-proc spPathConstraintPositionTimeline_create*(framesCount: cint): ptr spPathConstraintPositionTimeline
+proc spPathConstraintPositionTimeline_create*(framesCount: cint): ptr spPathConstraintPositionTimeline {.importc: "spPathConstraintPositionTimeline_create".}
 proc spPathConstraintPositionTimeline_setFrame*(
     self: ptr spPathConstraintPositionTimeline; frameIndex: cint; time: cfloat;
-    value: cfloat)
+    value: cfloat) {.importc: "spPathConstraintPositionTimeline_setFrame".}
 var PATHCONSTRAINTSPACING_ENTRIES*: cint = 2
 
 
-proc spPathConstraintSpacingTimeline_create*(framesCount: cint): ptr spPathConstraintSpacingTimeline
+proc spPathConstraintSpacingTimeline_create*(framesCount: cint): ptr spPathConstraintSpacingTimeline {.importc: "spPathConstraintSpacingTimeline_create".}
 proc spPathConstraintSpacingTimeline_setFrame*(
     self: ptr spPathConstraintSpacingTimeline; frameIndex: cint; time: cfloat;
-    value: cfloat)
+    value: cfloat) {.importc: "spPathConstraintSpacingTimeline_setFrame".}
 var PATHCONSTRAINTMIX_ENTRIES*: cint = 3
 
 
-proc spPathConstraintMixTimeline_create*(framesCount: cint): ptr spPathConstraintMixTimeline
+proc spPathConstraintMixTimeline_create*(framesCount: cint): ptr spPathConstraintMixTimeline {.importc: "spPathConstraintMixTimeline_create".}
 proc spPathConstraintMixTimeline_setFrame*(self: ptr spPathConstraintMixTimeline;
-    frameIndex: cint; time: cfloat; rotateMix: cfloat; translateMix: cfloat)
+    frameIndex: cint; time: cfloat; rotateMix: cfloat; translateMix: cfloat) {.importc: "spPathConstraintMixTimeline_setFrame".}
 
 
-proc spIkConstraintData_create*(name: cstring): ptr spIkConstraintData
-proc spIkConstraintData_dispose*(self: ptr spIkConstraintData)
+proc spIkConstraintData_create*(name: cstring): ptr spIkConstraintData {.importc: "spIkConstraintData_create".}
+proc spIkConstraintData_dispose*(self: ptr spIkConstraintData) {.importc: "spIkConstraintData_dispose".}
 
 
-proc spTransformConstraintData_create*(name: cstring): ptr spTransformConstraintData
-proc spTransformConstraintData_dispose*(self: ptr spTransformConstraintData)
+proc spTransformConstraintData_create*(name: cstring): ptr spTransformConstraintData {.importc: "spTransformConstraintData_create".}
+proc spTransformConstraintData_dispose*(self: ptr spTransformConstraintData) {.importc: "spTransformConstraintData_dispose".}
 
 
 
 
 
-proc spPathConstraintData_create*(name: cstring): ptr spPathConstraintData
-proc spPathConstraintData_dispose*(self: ptr spPathConstraintData)
+proc spPathConstraintData_create*(name: cstring): ptr spPathConstraintData {.importc: "spPathConstraintData_create".}
+proc spPathConstraintData_dispose*(self: ptr spPathConstraintData) {.importc: "spPathConstraintData_dispose".}
 
 
-proc spSkeletonData_create*(): ptr spSkeletonData
-proc spSkeletonData_dispose*(self: ptr spSkeletonData)
-proc spSkeletonData_findBone*(self: ptr spSkeletonData; boneName: cstring): ptr spBoneData
-proc spSkeletonData_findBoneIndex*(self: ptr spSkeletonData; boneName: cstring): cint
-proc spSkeletonData_findSlot*(self: ptr spSkeletonData; slotName: cstring): ptr spSlotData
-proc spSkeletonData_findSlotIndex*(self: ptr spSkeletonData; slotName: cstring): cint
-proc spSkeletonData_findSkin*(self: ptr spSkeletonData; skinName: cstring): ptr spSkin
-proc spSkeletonData_findEvent*(self: ptr spSkeletonData; eventName: cstring): ptr spEventData
-proc spSkeletonData_findAnimation*(self: ptr spSkeletonData; animationName: cstring): ptr spAnimation
+proc spSkeletonData_create*(): ptr spSkeletonData {.importc: "spSkeletonData_create".}
+proc spSkeletonData_dispose*(self: ptr spSkeletonData) {.importc: "spSkeletonData_dispose".}
+proc spSkeletonData_findBone*(self: ptr spSkeletonData; boneName: cstring): ptr spBoneData {.importc: "spSkeletonData_findBone".}
+proc spSkeletonData_findBoneIndex*(self: ptr spSkeletonData; boneName: cstring): cint {.importc: "spSkeletonData_findBoneIndex".}
+proc spSkeletonData_findSlot*(self: ptr spSkeletonData; slotName: cstring): ptr spSlotData {.importc: "spSkeletonData_findSlot".}
+proc spSkeletonData_findSlotIndex*(self: ptr spSkeletonData; slotName: cstring): cint {.importc: "spSkeletonData_findSlotIndex".}
+proc spSkeletonData_findSkin*(self: ptr spSkeletonData; skinName: cstring): ptr spSkin {.importc: "spSkeletonData_findSkin".}
+proc spSkeletonData_findEvent*(self: ptr spSkeletonData; eventName: cstring): ptr spEventData {.importc: "spSkeletonData_findEvent".}
+proc spSkeletonData_findAnimation*(self: ptr spSkeletonData; animationName: cstring): ptr spAnimation {.importc: "spSkeletonData_findAnimation".}
 proc spSkeletonData_findIkConstraint*(self: ptr spSkeletonData;
-                                     constraintName: cstring): ptr spIkConstraintData
+                                     constraintName: cstring): ptr spIkConstraintData {.importc: "spSkeletonData_findIkConstraint".}
 proc spSkeletonData_findTransformConstraint*(self: ptr spSkeletonData;
-    constraintName: cstring): ptr spTransformConstraintData
+    constraintName: cstring): ptr spTransformConstraintData {.importc: "spSkeletonData_findTransformConstraint".}
 proc spSkeletonData_findPathConstraint*(self: ptr spSkeletonData;
-                                       constraintName: cstring): ptr spPathConstraintData
+                                       constraintName: cstring): ptr spPathConstraintData {.importc: "spSkeletonData_findPathConstraint".}
 
 
-proc spBone_setYDown*(yDown: cint)
-proc spBone_isYDown*(): cint
-proc spBone_create*(data: ptr spBoneData; skeleton: ptr spSkeleton; parent: ptr spBone): ptr spBone
-proc spBone_dispose*(self: ptr spBone)
-proc spBone_setToSetupPose*(self: ptr spBone)
-proc spBone_updateWorldTransform*(self: ptr spBone)
+proc spBone_setYDown*(yDown: cint) {.importc: "spBone_setYDown".}
+proc spBone_isYDown*(): cint {.importc: "spBone_isYDown".}
+proc spBone_create*(data: ptr spBoneData; skeleton: ptr spSkeleton; parent: ptr spBone): ptr spBone {.importc: "spBone_create".}
+proc spBone_dispose*(self: ptr spBone) {.importc: "spBone_dispose".}
+proc spBone_setToSetupPose*(self: ptr spBone) {.importc: "spBone_setToSetupPose".}
+proc spBone_updateWorldTransform*(self: ptr spBone) {.importc: "spBone_updateWorldTransform".}
 proc spBone_updateWorldTransformWith*(self: ptr spBone; x: cfloat; y: cfloat;
                                      rotation: cfloat; scaleX: cfloat;
-                                     scaleY: cfloat; shearX: cfloat; shearY: cfloat)
-proc spBone_getWorldRotationX*(self: ptr spBone): cfloat
-proc spBone_getWorldRotationY*(self: ptr spBone): cfloat
-proc spBone_getWorldScaleX*(self: ptr spBone): cfloat
-proc spBone_getWorldScaleY*(self: ptr spBone): cfloat
-proc spBone_worldToLocalRotationX*(self: ptr spBone): cfloat
-proc spBone_worldToLocalRotationY*(self: ptr spBone): cfloat
-proc spBone_rotateWorld*(self: ptr spBone; degrees: cfloat)
-proc spBone_updateAppliedTransform*(self: ptr spBone)
+                                     scaleY: cfloat; shearX: cfloat; shearY: cfloat) {.importc: "spBone_updateWorldTransformWith".}
+proc spBone_getWorldRotationX*(self: ptr spBone): cfloat {.importc: "spBone_getWorldRotationX".}
+proc spBone_getWorldRotationY*(self: ptr spBone): cfloat {.importc: "spBone_getWorldRotationY".}
+proc spBone_getWorldScaleX*(self: ptr spBone): cfloat {.importc: "spBone_getWorldScaleX".}
+proc spBone_getWorldScaleY*(self: ptr spBone): cfloat {.importc: "spBone_getWorldScaleY".}
+proc spBone_worldToLocalRotationX*(self: ptr spBone): cfloat {.importc: "spBone_worldToLocalRotationX".}
+proc spBone_worldToLocalRotationY*(self: ptr spBone): cfloat {.importc: "spBone_worldToLocalRotationY".}
+proc spBone_rotateWorld*(self: ptr spBone; degrees: cfloat) {.importc: "spBone_rotateWorld".}
+proc spBone_updateAppliedTransform*(self: ptr spBone) {.importc: "spBone_updateAppliedTransform".}
 proc spBone_worldToLocal*(self: ptr spBone; worldX: cfloat; worldY: cfloat;
-                         localX: ptr cfloat; localY: ptr cfloat)
+                         localX: ptr cfloat; localY: ptr cfloat) {.importc: "spBone_worldToLocal".}
 proc spBone_localToWorld*(self: ptr spBone; localX: cfloat; localY: cfloat;
-                         worldX: ptr cfloat; worldY: ptr cfloat)
+                         worldX: ptr cfloat; worldY: ptr cfloat) {.importc: "spBone_localToWorld".}
 
 
-proc spSlot_create*(data: ptr spSlotData; bone: ptr spBone): ptr spSlot
-proc spSlot_dispose*(self: ptr spSlot)
-proc spSlot_setAttachment*(self: ptr spSlot; attachment: ptr spAttachment)
-proc spSlot_setAttachmentTime*(self: ptr spSlot; time: cfloat)
-proc spSlot_getAttachmentTime*(self: ptr spSlot): cfloat
-proc spSlot_setToSetupPose*(self: ptr spSlot)
+proc spSlot_create*(data: ptr spSlotData; bone: ptr spBone): ptr spSlot {.importc: "spSlot_create".}
+proc spSlot_dispose*(self: ptr spSlot) {.importc: "spSlot_dispose".}
+proc spSlot_setAttachment*(self: ptr spSlot; attachment: ptr spAttachment) {.importc: "spSlot_setAttachment".}
+proc spSlot_setAttachmentTime*(self: ptr spSlot; time: cfloat) {.importc: "spSlot_setAttachmentTime".}
+proc spSlot_getAttachmentTime*(self: ptr spSlot): cfloat {.importc: "spSlot_getAttachmentTime".}
+proc spSlot_setToSetupPose*(self: ptr spSlot) {.importc: "spSlot_setToSetupPose".}
   
 
 
-proc spIkConstraint_create*(data: ptr spIkConstraintData; skeleton: ptr spSkeleton): ptr spIkConstraint
-proc spIkConstraint_dispose*(self: ptr spIkConstraint)
-proc spIkConstraint_apply*(self: ptr spIkConstraint)
+proc spIkConstraint_create*(data: ptr spIkConstraintData; skeleton: ptr spSkeleton): ptr spIkConstraint {.importc: "spIkConstraint_create".}
+proc spIkConstraint_dispose*(self: ptr spIkConstraint) {.importc: "spIkConstraint_dispose".}
+proc spIkConstraint_apply*(self: ptr spIkConstraint) {.importc: "spIkConstraint_apply".}
 proc spIkConstraint_apply1*(bone: ptr spBone; targetX: cfloat; targetY: cfloat;
-                           alpha: cfloat)
+                           alpha: cfloat) {.importc: "spIkConstraint_apply1".}
 proc spIkConstraint_apply2*(parent: ptr spBone; child: ptr spBone; targetX: cfloat;
-                           targetY: cfloat; bendDirection: cint; alpha: cfloat)
+                           targetY: cfloat; bendDirection: cint; alpha: cfloat) {.importc: "spIkConstraint_apply2".}
 
 
 proc spTransformConstraint_create*(data: ptr spTransformConstraintData;
-                                  skeleton: ptr spSkeleton): ptr spTransformConstraint
-proc spTransformConstraint_dispose*(self: ptr spTransformConstraint)
-proc spTransformConstraint_apply*(self: ptr spTransformConstraint)
+                                  skeleton: ptr spSkeleton): ptr spTransformConstraint {.importc: "spTransformConstraint_create".}
+proc spTransformConstraint_dispose*(self: ptr spTransformConstraint) {.importc: "spTransformConstraint_dispose".}
+proc spTransformConstraint_apply*(self: ptr spTransformConstraint) {.importc: "spTransformConstraint_apply".}
 
 
 proc spVertexAttachment_computeWorldVertices*(self: ptr spVertexAttachment;
-    slot: ptr spSlot; worldVertices: ptr cfloat)
+    slot: ptr spSlot; worldVertices: ptr cfloat) {.importc: "spVertexAttachment_computeWorldVertices".}
 proc spVertexAttachment_computeWorldVertices1*(self: ptr spVertexAttachment;
-    start: cint; count: cint; slot: ptr spSlot; worldVertices: ptr cfloat; offset: cint)
+    start: cint; count: cint; slot: ptr spSlot; worldVertices: ptr cfloat; offset: cint) {.importc: "spVertexAttachment_computeWorldVertices1".}
 
 
-proc spAtlasPage_create*(atlas: ptr spAtlas; name: cstring): ptr spAtlasPage
-proc spAtlasPage_dispose*(self: ptr spAtlasPage)
+proc spAtlasPage_create*(atlas: ptr spAtlas; name: cstring): ptr spAtlasPage {.importc: "spAtlasPage_create".}
+proc spAtlasPage_dispose*(self: ptr spAtlasPage) {.importc: "spAtlasPage_dispose".}
 
 
-proc spAtlasRegion_create*(): ptr spAtlasRegion
-proc spAtlasRegion_dispose*(self: ptr spAtlasRegion)
+proc spAtlasRegion_create*(): ptr spAtlasRegion {.importc: "spAtlasRegion_create".}
+proc spAtlasRegion_dispose*(self: ptr spAtlasRegion) {.importc: "spAtlasRegion_dispose".}
 
-]#
+
 proc spAtlas_create*(data: cstring; length: cint; dir: cstring; rendererObject: pointer): ptr spAtlas {.importc: "spAtlas_create".}
 proc spAtlas_createFromFile*(path: cstring; rendererObject: pointer): ptr spAtlas {.importc: "spAtlas_createFromFile".}
 proc spAtlas_dispose*(atlas: ptr spAtlas) {.importc: "spAtlas_dispose".}
 proc spAtlas_findRegion*(self: ptr spAtlas; name: cstring): ptr spAtlasRegion {.importc: "spAtlas_findRegion".}
 
-#[
-proc spPathAttachment_create*(name: cstring): ptr spPathAttachment
+
+proc spPathAttachment_create*(name: cstring): ptr spPathAttachment {.importc: "spPathAttachment_create".}
 proc spPathAttachment_computeWorldVertices*(self: ptr spPathAttachment;
-    slot: ptr spSlot; worldVertices: ptr cfloat)
+    slot: ptr spSlot; worldVertices: ptr cfloat) {.importc: "spPathAttachment_computeWorldVertices".}
 proc spPathAttachment_computeWorldVertices1*(self: ptr spPathAttachment;
-    slot: ptr spSlot; start: cint; count: cint; worldVertices: ptr cfloat; offset: cint)
+    slot: ptr spSlot; start: cint; count: cint; worldVertices: ptr cfloat; offset: cint) {.importc: "spPathAttachment_computeWorldVertices1".}
 
 
 proc spPathConstraint_create*(data: ptr spPathConstraintData;
-                             skeleton: ptr spSkeleton): ptr spPathConstraint
-proc spPathConstraint_dispose*(self: ptr spPathConstraint)
-proc spPathConstraint_apply*(self: ptr spPathConstraint)
+                             skeleton: ptr spSkeleton): ptr spPathConstraint {.importc: "spPathConstraint_create".}
+proc spPathConstraint_dispose*(self: ptr spPathConstraint) {.importc: "spPathConstraint_dispose".}
+proc spPathConstraint_apply*(self: ptr spPathConstraint) {.importc: "spPathConstraint_apply".}
 proc spPathConstraint_computeWorldPositions*(self: ptr spPathConstraint;
     path: ptr spPathAttachment; spacesCount: cint; tangents: cint;
-    percentPosition: cint; percentSpacing: cint): ptr cfloat
+    percentPosition: cint; percentSpacing: cint): ptr cfloat {.importc: "spPathConstraint_computeWorldPositions".}
 
 
-proc spSkeleton_create*(data: ptr spSkeletonData): ptr spSkeleton
-proc spSkeleton_dispose*(self: ptr spSkeleton)
-proc spSkeleton_updateCache*(self: ptr spSkeleton)
-proc spSkeleton_updateWorldTransform*(self: ptr spSkeleton)
-proc spSkeleton_setToSetupPose*(self: ptr spSkeleton)
-proc spSkeleton_setBonesToSetupPose*(self: ptr spSkeleton)
-proc spSkeleton_setSlotsToSetupPose*(self: ptr spSkeleton)
-proc spSkeleton_findBone*(self: ptr spSkeleton; boneName: cstring): ptr spBone
-proc spSkeleton_findBoneIndex*(self: ptr spSkeleton; boneName: cstring): cint
-proc spSkeleton_findSlot*(self: ptr spSkeleton; slotName: cstring): ptr spSlot
-proc spSkeleton_findSlotIndex*(self: ptr spSkeleton; slotName: cstring): cint
-proc spSkeleton_setSkin*(self: ptr spSkeleton; skin: ptr spSkin)
-proc spSkeleton_setSkinByName*(self: ptr spSkeleton; skinName: cstring): cint
-proc spSkeleton_getAttachmentForSlotName*(self: ptr spSkeleton; slotName: cstring;
-    attachmentName: cstring): ptr spAttachment
+proc spSkeleton_create*(data: ptr spSkeletonData): ptr spSkeleton {.importc: "spSkeleton_create".}
+proc spSkeleton_dispose*(self: ptr spSkeleton) {.importc: "spSkeleton_dispose".}
+proc spSkeleton_updateCache*(self: ptr spSkeleton) {.importc: "spSkeleton_updateCache".}
+proc spSkeleton_updateWorldTransform*(self: ptr spSkeleton) {.importc: "spSkeleton_updateWorldTransform".}
+proc spSkeleton_setToSetupPose*(self: ptr spSkeleton) {.importc: "spSkeleton_setToSetupPose".}
+proc spSkeleton_setBonesToSetupPose*(self: ptr spSkeleton) {.importc: "spSkeleton_setBonesToSetupPose".}
+proc spSkeleton_setSlotsToSetupPose*(self: ptr spSkeleton) {.importc: "spSkeleton_setSlotsToSetupPose".}
+proc spSkeleton_findBone*(self: ptr spSkeleton; boneName: cstring): ptr spBone {.importc: "spSkeleton_findBone".}
+proc spSkeleton_findBoneIndex*(self: ptr spSkeleton; boneName: cstring): cint {.importc: "spSkeleton_findBoneIndex".}
+proc spSkeleton_findSlot*(self: ptr spSkeleton; slotName: cstring): ptr spSlot {.importc: "spSkeleton_findSlot".}
+proc spSkeleton_findSlotIndex*(self: ptr spSkeleton; slotName: cstring): cint {.importc: "spSkeleton_findSlotIndex".}
+proc spSkeleton_setSkin*(self: ptr spSkeleton; skin: ptr spSkin) {.importc: "spSkeleton_setSkin".}
+proc spSkeleton_setSkinByName*(self: ptr spSkeleton; skinName: cstring): cint {.importc: "spSkeleton_setSkinByName".}
+proc spSkeleton_getAttachmentForSlotName*(self: ptr spSkeleton; slotName: cstring; 
+    attachmentName: cstring): ptr spAttachment {.importc: "spSkeleton_getAttachmentForSlotName".}
 proc spSkeleton_getAttachmentForSlotIndex*(self: ptr spSkeleton; slotIndex: cint;
-    attachmentName: cstring): ptr spAttachment
+    attachmentName: cstring): ptr spAttachment {.importc: "spSkeleton_getAttachmentForSlotIndex".}
 proc spSkeleton_setAttachment*(self: ptr spSkeleton; slotName: cstring;
-                              attachmentName: cstring): cint
-proc spSkeleton_findIkConstraint*(self: ptr spSkeleton; constraintName: cstring): ptr spIkConstraint
-proc spSkeleton_findTransformConstraint*(self: ptr spSkeleton;
-                                        constraintName: cstring): ptr spTransformConstraint
-proc spSkeleton_findPathConstraint*(self: ptr spSkeleton; constraintName: cstring): ptr spPathConstraint
-proc spSkeleton_update*(self: ptr spSkeleton; deltaTime: cfloat)
+                              attachmentName: cstring): cint {.importc: "spSkeleton_setAttachment".}
+proc spSkeleton_findIkConstraint*(self: ptr spSkeleton; constraintName: cstring): ptr spIkConstraint {.importc: "spSkeleton_findIkConstraint".}
+proc spSkeleton_findTransformConstraint*(self: ptr spSkeleton; 
+                                        constraintName: cstring): ptr spTransformConstraint {.importc: "spSkeleton_findTransformConstraint".}
+proc spSkeleton_findPathConstraint*(self: ptr spSkeleton; constraintName: cstring): ptr spPathConstraint {.importc: "spSkeleton_findPathConstraint".}
+proc spSkeleton_update*(self: ptr spSkeleton; deltaTime: cfloat) {.importc: "spSkeleton_update".}
 
 
-proc spAttachmentLoader_dispose*(self: ptr spAttachmentLoader)
-proc spAttachmentLoader_createAttachment*(self: ptr spAttachmentLoader;
-    skin: ptr spSkin; `type`: spAttachmentType; name: cstring; path: cstring): ptr spAttachment
+proc spAttachmentLoader_dispose*(self: ptr spAttachmentLoader) {.importc: "spAttachmentLoader_dispose".}
+proc spAttachmentLoader_createAttachment*(self: ptr spAttachmentLoader; 
+    skin: ptr spSkin; `type`: spAttachmentType; name: cstring; path: cstring): ptr spAttachment {.importc: "spAttachmentLoader_createAttachment".}
 proc spAttachmentLoader_configureAttachment*(self: ptr spAttachmentLoader;
-    attachment: ptr spAttachment)
+    attachment: ptr spAttachment) {.importc: "spAttachmentLoader_configureAttachment".}
 proc spAttachmentLoader_disposeAttachment*(self: ptr spAttachmentLoader;
-    attachment: ptr spAttachment)
+    attachment: ptr spAttachment) {.importc: "spAttachmentLoader_disposeAttachment".}
 
 
 
-proc spRegionAttachment_create*(name: cstring): ptr spRegionAttachment
+proc spRegionAttachment_create*(name: cstring): ptr spRegionAttachment {.importc: "spRegionAttachment_create".}
 proc spRegionAttachment_setUVs*(self: ptr spRegionAttachment; u: cfloat; v: cfloat;
-                               u2: cfloat; v2: cfloat; rotate: cint)
-proc spRegionAttachment_updateOffset*(self: ptr spRegionAttachment)
+                               u2: cfloat; v2: cfloat; rotate: cint) {.importc: "spRegionAttachment_setUVs".}
+proc spRegionAttachment_updateOffset*(self: ptr spRegionAttachment) {.importc: "spRegionAttachment_updateOffset".}
 proc spRegionAttachment_computeWorldVertices*(self: ptr spRegionAttachment;
-    bone: ptr spBone; vertices: ptr cfloat)
+    bone: ptr spBone; vertices: ptr cfloat) {.importc: "spRegionAttachment_computeWorldVertices".}
 
 
-proc spMeshAttachment_create*(name: cstring): ptr spMeshAttachment
-proc spMeshAttachment_updateUVs*(self: ptr spMeshAttachment)
+proc spMeshAttachment_create*(name: cstring): ptr spMeshAttachment {.importc: "spMeshAttachment_create".}
+proc spMeshAttachment_updateUVs*(self: ptr spMeshAttachment) {.importc: "spMeshAttachment_updateUVs".}
 proc spMeshAttachment_computeWorldVertices*(self: ptr spMeshAttachment;
-    slot: ptr spSlot; worldVertices: ptr cfloat)
+    slot: ptr spSlot; worldVertices: ptr cfloat) {.importc: "spMeshAttachment_computeWorldVertices".}
 proc spMeshAttachment_setParentMesh*(self: ptr spMeshAttachment;
-                                    parentMesh: ptr spMeshAttachment)
+                                    parentMesh: ptr spMeshAttachment) {.importc: "spMeshAttachment_setParentMesh".}
 
 
-proc spBoundingBoxAttachment_create*(name: cstring): ptr spBoundingBoxAttachment
+proc spBoundingBoxAttachment_create*(name: cstring): ptr spBoundingBoxAttachment {.importc: "spBoundingBoxAttachment_create".}
 proc spBoundingBoxAttachment_computeWorldVertices*(
-    self: ptr spBoundingBoxAttachment; slot: ptr spSlot; worldVertices: ptr cfloat)
+    self: ptr spBoundingBoxAttachment; slot: ptr spSlot; worldVertices: ptr cfloat) {.importc: "spBoundingBoxAttachment_computeWorldVertices".}
 
 
-proc spAnimationStateData_create*(skeletonData: ptr spSkeletonData): ptr spAnimationStateData
-proc spAnimationStateData_dispose*(self: ptr spAnimationStateData)
+proc spAnimationStateData_create*(skeletonData: ptr spSkeletonData): ptr spAnimationStateData {.importc: "spAnimationStateData_create".}
+proc spAnimationStateData_dispose*(self: ptr spAnimationStateData) {.importc: "spAnimationStateData_dispose".}
 proc spAnimationStateData_setMixByName*(self: ptr spAnimationStateData;
                                        fromName: cstring; toName: cstring;
-                                       duration: cfloat)
+                                       duration: cfloat) {.importc: "spAnimationStateData_setMixByName".}
 proc spAnimationStateData_setMix*(self: ptr spAnimationStateData;
                                  `from`: ptr spAnimation; to: ptr spAnimation;
-                                 duration: cfloat)
+                                 duration: cfloat) {.importc: "spAnimationStateData_setMix".}
 proc spAnimationStateData_getMix*(self: ptr spAnimationStateData;
-                                 `from`: ptr spAnimation; to: ptr spAnimation): cfloat
-
-]#
+                                 `from`: ptr spAnimation; to: ptr spAnimation): cfloat {.importc: "spAnimationStateData_getMix".}
 
 
 proc spAnimationState_create*(data: ptr spAnimationStateData): ptr spAnimationState {.importc: "spAnimationState_create".}
@@ -962,14 +963,14 @@ proc spVertexAttachment_deinit*(self: ptr spVertexAttachment) {.importc: "_spVer
 proc spTimeline_init*(self: ptr spTimeline; `type`: spTimelineType;
                       dispose: proc (self: ptr spTimeline); apply: proc (
     self: ptr spTimeline; skeleton: ptr spSkeleton; lastTime: cfloat; time: cfloat;
-    firedEvents: ptr ptr spEvent; eventsCount: ptr cint; alpha: cfloat; setupPose: cint;
+    firedEvents: ptr UncheckedArray[ptr spEvent]; eventsCount: ptr cint; alpha: cfloat; setupPose: cint;
     mixingOut: cint); getPropertyId: proc (self: ptr spTimeline): cint) {.importc: "_spTimeline_init".}
 proc spTimeline_deinit*(self: ptr spTimeline) {.importc: "_spTimeline_deinit".}
 proc spCurveTimeline_init*(self: ptr spCurveTimeline; `type`: spTimelineType;
                            framesCount: cint;
                            dispose: proc (self: ptr spTimeline); apply: proc (
     self: ptr spTimeline; skeleton: ptr spSkeleton; lastTime: cfloat; time: cfloat;
-    firedEvents: ptr ptr spEvent; eventsCount: ptr cint; alpha: cfloat; setupPose: cint;
+    firedEvents: ptr UncheckedArray[ptr spEvent]; eventsCount: ptr cint; alpha: cfloat; setupPose: cint;
     mixingOut: cint); getPropertyId: proc (self: ptr spTimeline): cint) {.importc: "_spCurveTimeline_init".}
 proc spCurveTimeline_deinit*(self: ptr spCurveTimeline) {.importc: "_spCurveTimeline_deinit".}
 proc spCurveTimeline_binarySearch*(values: ptr cfloat; valuesLength: cint;

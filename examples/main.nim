@@ -1,5 +1,7 @@
+{.experimental.}
 import
-  events
+  events,
+  strutils
 
 import 
   bgfxdotnim,
@@ -19,6 +21,9 @@ type
   App = ref object
     eventHandler: AppEventHandler
 
+proc offset*[A](some: ptr A; b: int): ptr A =
+  result = cast[ptr A](cast[int](some) + (b * sizeof(A)))
+
 proc resize*(e: EventArgs) =
   let event = SDLEventMessage(e).event
   let sdlEventData = event.sdlEventData
@@ -36,7 +41,26 @@ proc initializeApp(app: App, ctx: Frag) =
   let skeletonData = spSkeletonJson_readSkeletonDataFile(json, "../spine-runtimes/spine-sfml/data/tank.json")
   spSkeletonJson_dispose(json)
 
-  echo repr skeletonData
+  let skeleton = spSkeleton_create(skeletonData)
+  let animData = spAnimationStateData_create(skeletonData)
+  let animState = spAnimationState_create(animData)
+  discard spAnimationState_setAnimationByName(animState, 0, "drive", true.cint)
+
+  var d = 3.cfloat
+  for i in 0..<1:
+    spSkeleton_update(skeleton, d)
+    spAnimationState_update(animState, d)
+    spAnimationState_apply(animState, skeleton)
+    spSkeleton_updateWorldTransform(skeleton)
+    
+    for ii in 0..<skeleton.bonesCount:
+      let bone = skeleton.bones.offset(ii)[0]
+      logInfo "$1 $2 $3 $4 $5 $6 $7".format(bone.data.name, bone.a, bone.b, bone.c, bone.d, bone.worldX, bone.worldY)
+    
+    logInfo "========================================\n"
+    d += 0.1f
+
+  spSkeleton_dispose(skeleton)
 
   logDebug "App initialized."
 
