@@ -346,10 +346,10 @@ proc init_space(app: App) =
 proc initApp(app: App, ctx: Frag) =
   logDebug "Initializing app..."
 
-  mapId = ctx.assets.load("maps/map.json", AssetType.TiledMap)
+  #mapId = ctx.assets.load("maps/map.json", AssetType.TiledMap)
 
-  while not assets.update(ctx.assets):
-    discard
+  #while not assets.update(ctx.assets):
+  #  discard
 
   atlas = spAtlas_createFromFile("../spine-runtimes/examples/Gunman/Gunman.atlas", nil)
   let attachmentLoader = cast[ptr spAttachmentLoader](attachment_loader.create(atlas))
@@ -596,9 +596,9 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
       attachmentVertices = nil
       app.batch.`end`()
 
-  let map = assets.get[TiledMap](ctx.assets, mapId)
+  #let map = assets.get[TiledMap](ctx.assets, mapId)
   
-  map.render(app.mapBatch, app.camera)
+  #map.render(app.mapBatch, app.camera)
 
       #nvgBeginFrame(app.nvgCtx, 960, 540, 1.0f)
       #app.space.default_draw_implementation()
