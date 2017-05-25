@@ -360,30 +360,30 @@ proc initApp(app: App, ctx: Frag) =
   skeletonData = spSkeletonJson_readSkeletonDataFile(json, "../spine-runtimes/examples/Gunman/Gunman.json")
 
   let skeleton = spSkeleton_create(skeletonData)
-  echo sizeof(skeleton)
+  #echo sizeof(skeleton)
 
-  drawable = SkeletonDrawable(
-    skeleton: skeleton,
-    animationState: spAnimationState_create(spAnimationStateData_create(skeletonData)),
-    timeScale: 1,
-    ownsAnimationData: true
-  )
+  #drawable = SkeletonDrawable(
+  #  skeleton: skeleton,
+  #  animationState: spAnimationState_create(spAnimationStateData_create(skeletonData)),
+  #  timeScale: 1,
+  #  ownsAnimationData: true
+  #)
 
-  drawable.skeleton.x = 960/2
-  drawable.skeleton.y = 540/2
+  #drawable.skeleton.x = 960/2
+  #drawable.skeleton.y = 540/2
 
-  spSkeleton_updateWorldTransform(drawable.skeleton)
+  #spSkeleton_updateWorldTransform(drawable.skeleton)
   
-  discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
+  #discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
 
-  app.animState = IDLE
+  #app.animState = IDLE
   #app.weapon = COUNT
   #app.lastWeapon = COUNT
   #discard spAnimationState_addAnimationByName(drawable.animationState, 1, "gungrab", 0, 2)
 
   #discard spAnimationState_addAnimationByName(drawable.animationState, 1, "Pistol_Idle", 0, 2)
 
-  app.mapBatch = SpriteBatch(
+  #[app.mapBatch = SpriteBatch(
     blendSrcFunc: BlendFunc.SrcAlpha,
     blendDstFunc: BlendFunc.InvSrcAlpha,
     blendingEnabled: true
@@ -395,7 +395,7 @@ proc initApp(app: App, ctx: Frag) =
     blendDstFunc: BlendFunc.InvSrcAlpha,
     blendingEnabled: true
   )
-  app.batch.init(1000, 0)
+  app.batch.init(1000, 0)]#
 
   app.camera = Camera()
   app.camera.init(0)
@@ -403,18 +403,18 @@ proc initApp(app: App, ctx: Frag) =
 
   init_space(app)
 
-  app.nvgCtx = nvgCreate(1, 1.cuchar)
+  #[app.nvgCtx = nvgCreate(1, 1.cuchar)
   bgfx_set_view_seq(1, true)
   
   echo nvgCreateFont(app.nvgCtx, "sans-bold", "roboto-bold.ttf")
 
-  logDebug "App initialized."
+  logDebug "App initialized."]#
 
 proc updateApp(app:App, ctx: Frag, deltaTime: float) =
   app.camera.update()
-  app.batch.setProjectionMatrix(app.camera.combined)
+  #app.batch.setProjectionMatrix(app.camera.combined)
   
-  drawable.skeleton.x = app.playerBody.position.x
+  #[drawable.skeleton.x = app.playerBody.position.x
   drawable.skeleton.y = app.playerBody.position.y
 
   if ctx.input.pressed("1"):
@@ -530,25 +530,25 @@ proc updateApp(app:App, ctx: Frag, deltaTime: float) =
       discard spAnimationState_setAnimationByName(drawable.animationState, 1, "Idle_Launcher", 1)
       app.player.lastWeaponIndex = 3
   else:
-    discard
+    discard]#
         
       
 
   #else:
   #  discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
 
-  if not drawable.isNil:
+  #[if not drawable.isNil:
     spSkeleton_update(drawable.skeleton, deltaTime)
     spAnimationState_update(drawable.animationState, deltaTime * drawable.timeScale)
     spAnimationState_apply(drawable.animationState, drawable.skeleton)
-    spSkeleton_updateWorldTransform(drawable.skeleton)
+    spSkeleton_updateWorldTransform(drawable.skeleton)]#
 
   app.space.step(1.0/60)
 
 proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   ctx.graphics.clearView(0, ClearMode.Color.ord or ClearMode.Depth.ord, colors.Color(0x303030ff), 1.0, 0)
   
-  var texture: Texture
+  #[var texture: Texture
   var attachmentVertices : AttachmentVertices
   if not drawable.isNil:
     for i in 0..<skeletonData.slotsCount:
@@ -594,7 +594,7 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
       app.batch.begin()
       app.batch.draw(attachmentVertices.texture, attachmentVertices.renderData.vertices, attachmentVertices.renderData.indices)
       attachmentVertices = nil
-      app.batch.`end`()
+      app.batch.`end`()]#
 
   #let map = assets.get[TiledMap](ctx.assets, mapId)
   

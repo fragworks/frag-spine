@@ -93,7 +93,7 @@ type
     framesCount*: cint
     frames*: ptr cfloat
     slotIndex*: cint
-    attachmentNames*: cstringArray
+    attachmentNames*: ptr UncheckedArray[cstring]
 
   spEventTimeline* = object
     super*: spTimeline
@@ -183,12 +183,6 @@ type
 
   spSkin* = object
     name*: cstring
-
-  Entry* = object
-    slotIndex*: cint
-    name*: cstring
-    attachment*: ptr spAttachment
-    next*: ptr Entry
 
   spIkConstraintData* = object
     name*: cstring
