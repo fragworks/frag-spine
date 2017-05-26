@@ -28,7 +28,7 @@ type
     indices: seq[uint16]
     maxSprites: int
     lastTexture: Texture
-    drawing: bool
+    drawing*: bool
     programHandle: bgfx_program_handle_t
     tibh: bgfx_index_buffer_handle_t
     vDecl: ptr bgfx_vertex_decl_t
@@ -47,20 +47,20 @@ proc flush(spineSpriteBatch: SpineSpriteBatch) =
   if spineSpriteBatch.lastTexture.isNil:
     return
 
-  discard bgfx_touch(0)
+  discard bgfx_touch(spineSpriteBatch.view)
 
   var vb : bgfx_transient_vertex_buffer_t
   bgfx_alloc_transient_vertex_buffer(addr vb, uint32 spineSpriteBatch.vertices.len, spineSpriteBatch.vDecl);
   copyMem(vb.data, addr spineSpriteBatch.vertices[0], sizeof(PosUVColorVertex) * spineSpriteBatch.vertices.len)
 
-  bgfx_set_texture(0, spineSpriteBatch.texHandle, spineSpriteBatch.lastTexture.handle, high(uint32))
+  bgfx_set_texture(1, spineSpriteBatch.texHandle, spineSpriteBatch.lastTexture.handle, high(uint32))
   bgfx_set_transient_vertex_buffer(addr vb, 0u32, uint32 spineSpriteBatch.vertices.len)
 
-  if spineSpriteBatch.indices.len > 0:
-    var tib : bgfx_transient_index_buffer_t
-    bgfx_alloc_transient_index_buffer(addr tib, spineSpriteBatch.indices.len.uint32)
-    copyMem(tib.data, addr spineSpriteBatch.indices[0], sizeof(uint16) * spineSpriteBatch.indices.len)
-    bgfx_set_transient_index_buffer(addr tib, 0, spineSpriteBatch.indices.len.uint32)
+  #if spineSpriteBatch.indices.len > 0:
+  var tib : bgfx_transient_index_buffer_t
+  bgfx_alloc_transient_index_buffer(addr tib, spineSpriteBatch.indices.len.uint32)
+  copyMem(tib.data, addr spineSpriteBatch.indices[0], sizeof(uint16) * spineSpriteBatch.indices.len)
+  bgfx_set_transient_index_buffer(addr tib, 0, spineSpriteBatch.indices.len.uint32)
   
   var mtx: fpumath.Mat4
   mtxIdentity(mtx)
@@ -71,10 +71,10 @@ proc flush(spineSpriteBatch: SpineSpriteBatch) =
     bgfx_set_state(0'u64 or BGFX_STATE_RGB_WRITE or BGFX_STATE_ALPHA_WRITE or BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA
       , BGFX_STATE_BLEND_INV_SRC_ALPHA), 0)
 
-  discard bgfx_submit(spineSpriteBatch.view, spineSpriteBatch.programHandle, 0, false)
+  discard bgfx_submit(spineSpriteBatch.view, spineSpriteBatch.programHandle, 1, false)
 
-  spineSpriteBatch.vertices.setLen(0)
-  spineSpriteBatch.indices.setLen(0)
+  echo spineSpriteBatch.vertices.len
+  echo spineSpriteBatch.indices.len
 
 proc switchTexture(SpineSpriteBatch: SpineSpriteBatch, texture: Texture) =
   flush(SpineSpriteBatch)
@@ -85,17 +85,18 @@ proc draw*(spineSpriteBatch: SpineSpriteBatch, texture: Texture, vertices: seq[P
     logError "SpineSpriteBatch not in drawing mode. Call begin before calling draw."
     return
 
-  #if texture != spineSpriteBatch.lastTexture:
-  #  echo "SWITCHING TEXTURE!"
-  #  switchTexture(spineSpriteBatch, texture)
+  if texture != spineSpriteBatch.lastTexture:
+    switchTexture(spineSpriteBatch, texture)
 
-  spineSpriteBatch.lastTexture = texture
+  #spineSpriteBatch.lastTexture = texture
   
-  if spineSpriteBatch.indices.len == 0:
+  #if spineSpriteBatch.indices.len == 0:
+  if not indices.isNil:
     spineSpriteBatch.indices.add(indices)
   
   #if spineSpriteBatch.vertices.len == 0:
-  spineSpriteBatch.vertices.add(vertices)
+  if not vertices.isNil:
+    spineSpriteBatch.vertices.add(vertices)
 
 
 proc init*(spineSpriteBatch: SpineSpriteBatch, maxSprites: int, view: uint8) =
@@ -146,7 +147,10 @@ proc `end`*(SpineSpriteBatch: SpineSpriteBatch) =
   if SpineSpriteBatch.vertices.len > 0:
     flush(SpineSpriteBatch)
 
-  SpineSpriteBatch.lastTexture = nil
+  SpineSpriteBatch.vertices.setLen(0)
+  SpineSpriteBatch.indices.setLen(0)
+
+  #SpineSpriteBatch.lastTexture = nil
   SpineSpriteBatch.drawing = false
 
 proc dispose*(spineSpriteBatch: SpineSpriteBatch) =

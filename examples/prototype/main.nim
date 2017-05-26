@@ -63,7 +63,7 @@ var vertexArray: seq[PosUvColorVertex] = @[]
 var triangleArray: seq[uint16] = @[]
 var lastBlendMode: spBlendMode
 var a = App()
-var mapId: Hash
+var mapId, textureId: Hash
 
 const WIDTH = 960
 const HEIGHT = 540
@@ -346,10 +346,11 @@ proc init_space(app: App) =
 proc initApp(app: App, ctx: Frag) =
   logDebug "Initializing app..."
 
-  #mapId = ctx.assets.load("maps/map.json", AssetType.TiledMap)
+  mapId = ctx.assets.load("maps/map.json", AssetType.TiledMap)
+  textureId = ctx.assets.load("test02.png", AssetType.Texture)
 
-  #while not assets.update(ctx.assets):
-  #  discard
+  while not assets.update(ctx.assets):
+    discard
 
   atlas = spAtlas_createFromFile("../spine-runtimes/examples/Gunman/Gunman.atlas", nil)
   let attachmentLoader = cast[ptr spAttachmentLoader](attachment_loader.create(atlas))
@@ -362,19 +363,19 @@ proc initApp(app: App, ctx: Frag) =
   let skeleton = spSkeleton_create(skeletonData)
   #echo sizeof(skeleton)
 
-  #drawable = SkeletonDrawable(
-  #  skeleton: skeleton,
-  #  animationState: spAnimationState_create(spAnimationStateData_create(skeletonData)),
-  #  timeScale: 1,
-  #  ownsAnimationData: true
-  #)
+  drawable = SkeletonDrawable(
+    skeleton: skeleton,
+    animationState: spAnimationState_create(spAnimationStateData_create(skeletonData)),
+    timeScale: 1,
+    ownsAnimationData: true
+  )
 
-  #drawable.skeleton.x = 960/2
-  #drawable.skeleton.y = 540/2
+  drawable.skeleton.x = 960/2
+  drawable.skeleton.y = 540/2
 
-  #spSkeleton_updateWorldTransform(drawable.skeleton)
+  spSkeleton_updateWorldTransform(drawable.skeleton)
   
-  #discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
+  discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
 
   #app.animState = IDLE
   #app.weapon = COUNT
@@ -383,19 +384,12 @@ proc initApp(app: App, ctx: Frag) =
 
   #discard spAnimationState_addAnimationByName(drawable.animationState, 1, "Pistol_Idle", 0, 2)
 
-  #[app.mapBatch = SpriteBatch(
+  app.mapBatch = SpriteBatch(
     blendSrcFunc: BlendFunc.SrcAlpha,
     blendDstFunc: BlendFunc.InvSrcAlpha,
     blendingEnabled: true
   )
   app.mapBatch.init(1000, 0)
-
-  app.batch = SpineSpriteBatch(
-    blendSrcFunc: BlendFunc.SrcAlpha,
-    blendDstFunc: BlendFunc.InvSrcAlpha,
-    blendingEnabled: true
-  )
-  app.batch.init(1000, 0)]#
 
   app.camera = Camera()
   app.camera.init(0)
@@ -403,18 +397,18 @@ proc initApp(app: App, ctx: Frag) =
 
   init_space(app)
 
-  #[app.nvgCtx = nvgCreate(1, 1.cuchar)
+  app.nvgCtx = nvgCreate(1, 1.cuchar)
   bgfx_set_view_seq(1, true)
   
   echo nvgCreateFont(app.nvgCtx, "sans-bold", "roboto-bold.ttf")
 
-  logDebug "App initialized."]#
+  logDebug "App initialized."
 
 proc updateApp(app:App, ctx: Frag, deltaTime: float) =
   app.camera.update()
-  #app.batch.setProjectionMatrix(app.camera.combined)
+  app.mapBatch.setProjectionMatrix(app.camera.combined)
   
-  #[drawable.skeleton.x = app.playerBody.position.x
+  drawable.skeleton.x = app.playerBody.position.x
   drawable.skeleton.y = app.playerBody.position.y
 
   if ctx.input.pressed("1"):
@@ -530,28 +524,36 @@ proc updateApp(app:App, ctx: Frag, deltaTime: float) =
       discard spAnimationState_setAnimationByName(drawable.animationState, 1, "Idle_Launcher", 1)
       app.player.lastWeaponIndex = 3
   else:
-    discard]#
+    discard
         
       
 
   #else:
   #  discard spAnimationState_setAnimationByName(drawable.animationState, 0, "Idle", 1)
 
-  #[if not drawable.isNil:
+  if not drawable.isNil:
     spSkeleton_update(drawable.skeleton, deltaTime)
     spAnimationState_update(drawable.animationState, deltaTime * drawable.timeScale)
     spAnimationState_apply(drawable.animationState, drawable.skeleton)
-    spSkeleton_updateWorldTransform(drawable.skeleton)]#
+    spSkeleton_updateWorldTransform(drawable.skeleton)
 
   app.space.step(1.0/60)
 
 proc renderApp(app: App, ctx: Frag, deltaTime: float) =
   ctx.graphics.clearView(0, ClearMode.Color.ord or ClearMode.Depth.ord, colors.Color(0x303030ff), 1.0, 0)
   
-  #[var texture: Texture
+  let map = assets.get[TiledMap](ctx.assets, mapId)
+  let tex = assets.get[Texture](ctx.assets, textureId)
+  #map.render(app.mapBatch, app.camera)
+  #var test: seq[int] = @[]
+
+  var texture: Texture
   var attachmentVertices : AttachmentVertices
+  app.mapBatch.begin()
+  app.mapBatch.draw(tex, 0, 0, tex.width.float, tex.height.float)
+  map.render(app.mapBatch, app.camera)
   if not drawable.isNil:
-    for i in 0..<skeletonData.slotsCount:
+    for i in 0..<drawable.skeleton.slotsCount:
       let slot = drawable.skeleton.drawOrder.offset(i)[0]
       let attachment = slot.attachment
 
@@ -560,25 +562,29 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
 
       if attachment.`type` == SP_ATTACHMENT_REGION:
         let regionAttachment = cast[ptr spRegionAttachment](attachment)
-        attachmentVertices = cast[AttachmentVertices]
-        (regionAttachment.rendererObject)
-        texture = attachmentVertices.texture
         spRegionAttachment_computeWorldVertices(regionAttachment, slot.bone, addr worldVertices[0])
+        attachmentVertices = cast[AttachmentVertices](regionAttachment.rendererObject)
+
 
         if attachmentVertices.renderData.isNil:
+          app.mapBatch.`end`()
+          return
+        
+        if attachmentVertices.renderData.vertices.isNil:
+          app.mapBatch.`end`()
           return
 
         var w = 0
-        for i in 0..<4:
-          if worldVertices.len > w + 1:
-            attachmentVertices.renderData.vertices[i].x = worldVertices[w]
-            attachmentVertices.renderData.vertices[i].y = worldVertices[w + 1]
-            attachmentVertices.renderData.vertices[i].abgr = 0xFFFFFFFF.uint32
+        for j in 0..<attachmentVertices.renderData.vertices.len:
+          if worldVertices.len >= w + 1:
+            attachmentVertices.renderData.vertices[j].x = worldVertices[w]
+            attachmentVertices.renderData.vertices[j].y = worldVertices[w + 1]
+            attachmentVertices.renderData.vertices[j].abgr = 0xFFFFFFFF.uint32
             inc(w, 2)
-        
-      elif attachment.`type` == SP_ATTACHMENT_MESH:
+        var indices = @[0u16, 1, 2, 2, 3, 0]
+        app.mapBatch.draw(attachmentVertices.texture, attachmentVertices.renderData.vertices)
+      #[elif attachment.`type` == SP_ATTACHMENT_MESH:
         let meshAttachment = cast[ptr spMeshAttachment](attachment)
-          
         attachmentVertices = cast[AttachmentVertices](meshAttachment.rendererObject)
         spMeshAttachment_computeWorldVertices(meshAttachment, slot, addr worldVertices[0])
 
@@ -589,16 +595,9 @@ proc renderApp(app: App, ctx: Frag, deltaTime: float) =
           attachmentVertices.renderData.vertices[i].y = worldVertices[w + 1]
           attachmentVertices.renderData.vertices[i].abgr = 0xFFFFFFFF.uint32
           inc(w, 2)
-          inc(i)
-      
-      app.batch.begin()
-      app.batch.draw(attachmentVertices.texture, attachmentVertices.renderData.vertices, attachmentVertices.renderData.indices)
-      attachmentVertices = nil
-      app.batch.`end`()]#
+          inc(i)]#
 
-  #let map = assets.get[TiledMap](ctx.assets, mapId)
-  
-  #map.render(app.mapBatch, app.camera)
+  app.mapBatch.`end`()
 
       #nvgBeginFrame(app.nvgCtx, 960, 540, 1.0f)
       #app.space.default_draw_implementation()
